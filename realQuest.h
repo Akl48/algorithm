@@ -13,7 +13,7 @@ struct comp {
         return false;
     }
 };
-    // 输出最大值 偶数优先级 > 奇数 同等级更大的大
+    // 给定一个以,号区分的字符串后面跟着一个以;的数字 输出最大值 偶数优先级 > 奇数 同等级更大的大
 void printMax(string &str){
     int len = (int)str.length() - 1;
     int i = 0;
@@ -47,4 +47,36 @@ void printMax(string &str){
     }
     return ;
 }
+};
+
+class ByteDance {
+    /*
+    给定一个数组完成对数组的乱序（洗牌算法）
+    */
+    void mergeCard(vector<int> &array) {
+        int len = (int)array.size();
+        if (len <= 1) return;
+        vector<int> newArray;
+        for (int i = len - 1; i >= 0 ; i++ ) {
+            srand(unsigned(time(NULL)));
+            int index = rand() % i;
+            newArray.push_back(array[index]);
+            array.erase(array.begin()+index);
+        }
+    }
+};
+
+class sina {
+    /*
+        约瑟夫环问题数学
+    */
+    int LastRemaining_Solution(int n, int m)
+    {
+        if (n == 0) return -1;
+        if (n == 1) return 0;
+        return (LastRemaining_Solution(n - 1 , m) + m) % n;
+    }
+    /*
+        字符串变换问题dp
+    */
 };
