@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "istream": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "queue": "cpp"
     }
 }
