@@ -258,7 +258,22 @@ class _11_offer {
      * 此时得到的最大乘积是18。
      */
     int cutRope(int number) {
-
+    if (number < 2)
+        return 0;
+    if (number == 2)
+        return 1;
+    if (number == 3)
+        return 2;
+ 
+    int timesOf3 = number / 3;
+ 
+    /*  当最后绳子长度为 4 时，这时候分割成 2，2 而不是 3，1 因为2*2=4 > 3=3*1  */
+    if (number - timesOf3 * 3 == 1)
+        timesOf3--;
+ 
+    int timesOf2 = (number - timesOf3 * 3) / 2;
+ 
+    return (int)(pow(3, timesOf3))*(int)(pow(2, timesOf2));
     }
 };
 
@@ -333,5 +348,136 @@ class _13_offer {
             node2 = node2->next;
         }
         return node1;
+    }
+};
+
+class _14_offer {
+    /*
+     * 统计一个数字在排序数组中出现的次数。
+     */
+    int GetNumberOfK(vector<int> data ,int k) {
+        int res = 0;
+        int len = (int)data.size();
+        if ( len <= 0 ) return res;
+        int left = 0 , right = len - 1 , mid = 0;
+        while (left <= right) {
+            mid = left + (right - left)/2;
+            if (data[mid] == k) {
+                res++;
+                break;
+            } else if (data[mid] > k) {
+                right = mid - 1;
+            } else if (data[mid] < k) {
+                left = mid + 1;
+            }
+        }
+        if (res <= 0) return 0;
+        for (int i = mid + 1 ; i < len ; ++i ) {
+            if (data[i] == k)
+                res++;
+            else
+                break;
+        }
+        for (int i = mid - 1; i >= 0 ; --i ) {
+            if (data[i] == k)
+                res++;
+            else
+                break;
+        }
+        return res;
+    }
+};
+
+class _15_offer {
+    /*
+     * 请实现一个函数按照之字形打印二叉树，即第一行按照从左到右的顺序打印
+     * 第二层按照从右至左的顺序打印，第三行按照从左到右的顺序打印，其他行以此类推。
+     */
+    vector<vector<int> > Print(TreeNode* pRoot) {
+        stack<TreeNode*> preStack;
+        stack<TreeNode*> lastStack;
+        vector<vector<int> > treeList;
+        if (pRoot == NULL) return treeList;
+        preStack.push(pRoot);
+        while (!preStack.empty() || !lastStack.empty())
+        {
+            vector<int> tree;
+            while(!preStack.empty()) {
+                tree.push_back(preStack.top()->val);
+                if (preStack.top()->left)
+                    lastStack.push(preStack.top()->left);
+                if (preStack.top()->right)
+                    lastStack.push(preStack.top()->right);
+                preStack.pop();
+            }
+            if (!tree.empty())
+                treeList.push_back(tree);
+
+            vector<int> tree2;
+            while(!lastStack.empty()) {
+                tree2.push_back(lastStack.top()->val);
+                if (lastStack.top()->right)
+                    preStack.push(lastStack.top()->right);
+                if (lastStack.top()->left)
+                    preStack.push(lastStack.top()->left);
+                lastStack.pop();
+            }
+            if (!tree2.empty())
+                treeList.push_back(tree2);
+        }
+        return treeList;
+    }
+};
+
+class _16_offer {
+    /*
+     * 从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。
+     */
+    vector<vector<int> > Print(TreeNode* pRoot) {
+        queue<TreeNode*> queue1;
+        queue<TreeNode*> queue2;
+        vector<vector<int> > res;
+        if (pRoot == NULL) return res;
+        queue1.push(pRoot);
+        while(!queue1.empty()||!queue2.empty()) {
+            vector<int> tree;
+            while(!queue1.empty()) {
+                tree.push_back(queue1.front()->val);
+                if (queue1.front()->left)
+                    queue2.push(queue1.front()->left);
+                if (queue1.front()->right)
+                    queue2.push(queue1.front()->right);
+                queue1.pop();
+            }
+            if (!tree.empty())
+                res.push_back(tree);
+
+            vector<int> tree2;
+            while(!queue2.empty()) {
+                tree2.push_back(queue2.front()->val);
+                if (queue2.front()->left)
+                    queue1.push(queue2.front()->left);
+                if (queue2.front()->right)
+                    queue1.push(queue2.front()->right);
+                queue2.pop();
+            }
+            if (!tree2.empty())
+                res.push_back(tree2);
+        }
+        return res;
+    }
+};
+
+class _17_offer {
+    /*
+     * 请实现两个函数，分别用来序列化和反序列化二叉树
+     * 二叉树的序列化是指：把一棵二叉树按照某种遍历方式的结果以某种格式保存为字符串，从而使得内存中建立起来的二叉树可以持久保存。序列化可以基于先序、中序、后序、层序的二叉树遍历方式来进行修改，序列化的结果是一个字符串，序列化时通过 某种符号表示空节点（#），以 ！ 表示一个结点值的结束（value!）。
+     * 二叉树的反序列化是指：根据某种遍历顺序得到的序列化字符串结果str，重构二叉树。
+     */
+    char* Serialize(TreeNode *root) {    
+        
+    }
+    TreeNode* Deserialize(char *str) {
+    
     }
 };
