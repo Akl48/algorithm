@@ -471,13 +471,316 @@ class _16_offer {
 class _17_offer {
     /*
      * 请实现两个函数，分别用来序列化和反序列化二叉树
-     * 二叉树的序列化是指：把一棵二叉树按照某种遍历方式的结果以某种格式保存为字符串，从而使得内存中建立起来的二叉树可以持久保存。序列化可以基于先序、中序、后序、层序的二叉树遍历方式来进行修改，序列化的结果是一个字符串，序列化时通过 某种符号表示空节点（#），以 ！ 表示一个结点值的结束（value!）。
+     * 二叉树的序列化是指：把一棵二叉树按照某种遍历方式的结果以某种格式保存为字符串，从而使得内存中建立起来的二叉树可以持久保存。
+     * 序列化可以基于先序、中序、后序、层序的二叉树遍历方式来进行修改，序列化的结果是一个字符串
+     * 序列化时通过 某种符号表示空节点（#），以 ！ 表示一个结点值的结束（value!）。
      * 二叉树的反序列化是指：根据某种遍历顺序得到的序列化字符串结果str，重构二叉树。
      */
     char* Serialize(TreeNode *root) {    
         
     }
     TreeNode* Deserialize(char *str) {
-    
+        
+    }
+};
+
+class _18_offer {
+    /*
+     * 给一个数组，返回它的最大连续子序列的和
+     */
+    int FindGreatestSumOfSubArray(vector<int> array) {
+        int len = (int)array.size();
+        if (len <= 0) return 0;
+        int res = array[0];
+        vector<int> dp(len);
+        dp[0] = array[0];
+        for (int i = 1 ; i < len ; i++ ) {
+            dp[i] = max(dp[i - 1] + array[i],array[i]);
+            res = max(res , dp[i]);
+        }
+        return res;
+    }
+};
+
+class _19_offer {
+    /*
+     * 输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。
+     */
+    string PrintMinNumber(vector<int> numbers) {
+        int len = numbers.size();
+        string res = "";
+        if (len <= 0) return res;
+        sort(numbers.begin(),numbers.end(),cmp);
+        for (int i = 0 ; i < len ; i++ ) {
+            res += to_string(numbers[i]);
+        }
+        return res;
+    }
+    static bool cmp(int a,int b) {
+        string A = "";
+        string B = "";
+        A += to_string(a);
+        A += to_string(b);
+        B += to_string(b);
+        B += to_string(a);
+        return A < B;
+    }
+};
+
+class _20_offer {
+    /*
+     * 求出1~13的整数中1出现的次数,并算出100~1300的整数中1出现的次数？
+     */
+    int NumberOf1Between1AndN_Solution(int n)
+    {  
+        if (n <= 0) return 0;
+        int res = 0;
+        for(int i = 1; i <= n; i *= 10){
+             int diviver = i * 10;          
+             res += (n / diviver) * i + min(max(n % diviver - i + 1, 0), i);
+        }
+         return res;
+    }
+};
+
+class _21_offer {
+    /*
+     * 输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的双向链表。
+     * 要求不能创建任何新的结点，只能调整树中结点指针的指向。
+     */
+    TreeNode* Convert(TreeNode* pRootOfTree)
+    {
+        if (pRootOfTree == NULL) return NULL;
+        if (pRootOfTree->left == NULL && pRootOfTree->right == NULL)
+            return pRootOfTree;
+        TreeNode *left = Convert(pRootOfTree->left);
+        TreeNode *p = left;
+        while (p!=NULL && p->right!=NULL) {
+            p = p->right;
+        }
+        if (left!=NULL) {
+            p->right = pRootOfTree;
+            pRootOfTree->left = p;
+        }
+        TreeNode *right = Convert(pRootOfTree->right);
+        if (right!=NULL) {
+            right->left = pRootOfTree;
+            pRootOfTree->right = right;
+        }
+        return left!=NULL? left : pRootOfTree;
+    }
+};
+
+class _22_offer {
+    /*
+     * 在一个字符串(0<=字符串长度<=10000，全部由字母组成)
+     * 中找到第一个只出现一次的字符,并返回它的位置
+     * 如果没有则返回 -1（需要区分大小写）.
+     */
+    int FirstNotRepeatingChar(string str) {
+        int len = str.length();
+        if (len <= 1)
+            return -1;
+        char ch[256]={0};
+        for(int i=0;i<str.size();i++){
+            ch[str[i]]++;
+        }
+        for(int i=0;i<str.size();i++)
+            if(ch[str[i]]==1)
+                return i;
+        return 0;
+    }
+};
+
+class _23_offer {
+    /*
+     * 给定一棵二叉搜索树，请找出其中的第k小的结点。
+     * 例如（5，3，7，2，4，6，8）中，按结点数值大小顺序第三小结点的值为4。
+     */
+    TreeNode* KthNode(TreeNode* pRoot, int k)
+    {
+        if (pRoot == NULL || k == 0) return NULL;
+        stack<TreeNode*> treeStack;
+        int count = 0;
+        TreeNode *node = pRoot;
+        do {
+            if (node!=NULL) {
+                treeStack.push(node);
+                node = node->left;
+            } else {
+                node = treeStack.top();
+                treeStack.pop();
+                count++;
+                if (count == k)
+                    return node;
+                node = node->right;
+            }
+        } while(node!=NULL||!treeStack.empty());
+        return NULL;
+    }
+};
+
+class _24_offer {
+    /*
+     * 如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。
+     * 如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。
+     * 我们使用Insert()方法读取数据流，使用GetMedian()方法获取当前读取数据的中位数。
+     */
+    vector<int> array;
+    void Insert(int num)
+    {
+        array.push_back(num);
+    }
+
+    double GetMedian()
+    { 
+        int len = array.size();
+        if (len <= 0) return 0;
+        sort(array.begin(),array.end());
+        if (len % 2 == 0) {
+            return 1.0 * (array[len/2]+array[len/2-1])/2.0;
+        } else {
+            return array[len / 2];
+        }
+    }
+};
+
+class _25_offer {
+    /*
+     * 如何不用四则运算符做加法
+     */ 
+    int Add(int num1, int num2)
+    {
+        while (num2!=0) {
+            int tmp = num1 ^ num2;
+            int cur = (num1 & num2) << 1;
+            num1 = tmp;
+            num2 = cur;
+        }
+        return num1;
+    }
+};
+
+class _26_offer {
+    /*
+     * 给定一个数组和滑动窗口的大小，找出所有滑动窗口里数值的最大值
+     */
+    vector<int> maxInWindows(const vector<int>& num, unsigned int size)
+    {
+        vector<int> res;
+        deque<int> s;
+        for (int i = 0 ; i < num.size() ; i++) {
+            while (s.size() && num[s.back()] <= num[i]) {
+                s.pop_back();
+            }
+            while (s.size() && s.front() <i - size + 1) {//i-s.front()+1>size
+                s.pop_front();
+            }
+            s.push_back(i);
+            if (size && i + 1 >= size) {
+                res.push_back(num[s.front()]);
+            }
+        }
+        return res;
+    }
+};
+class _27_offer {
+    /*
+     * 汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，
+     * 就是用字符串模拟这个指令的运算结果。对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。
+     */
+    // 不推荐
+    string LeftRotateString(string str, int n) {
+        int len = str.length();
+        if (n < 0 || len <= 0) return NULL;
+        if (n == 0) return str;
+
+        string res = str.substr(0,n);
+        str.erase(0,n);
+        str += res;
+        return str;
+    }
+    // 3次翻转
+    string leftRotateString(string str ,int n) {
+        reverse(str.begin(), str.end());
+        reverse(str.begin(), str.begin() + str.size() - n);
+        reverse(str.begin() + str.size() - n, str.end());
+        return str;
+    }
+};
+
+class _28_offer {
+    /*
+     * 能不能也很快的找出所有和为S的连续正数序列?
+     */
+    vector<vector<int> > FindContinuousSequence(int sum) {
+        vector<vector<int> > res;
+        if (sum <= 0) return res;
+        int i = 1 , j = 2;
+        while (j > i) {
+            int curSum = (i + j)*(j - i + 1) / 2;
+            if (curSum == sum) {
+                vector<int> res1;
+                for (int m = i ; m <= j ; m++ ) {
+                    res1.push_back(m);
+                }
+                res.push_back(res1);
+                i++;
+            } else if (curSum > sum) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+        return res;
+    }
+};
+
+class _29_offer {
+    /*
+     * 实现一个函数用来匹配包括'.'和'*'的正则表达式。模式中的字符'.'表示任意一个字符
+     * 而'*'表示它前面的字符可以出现任意次（包含0次）。 
+     * 在本题中，匹配是指字符串的所有字符匹配整个模式。
+     * 例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但是与"aa.a"和"ab*a"均不匹配
+     */
+    bool match(char* str, char* pattern)
+    {
+        if (*str == '\0' && *pattern == '\0')
+            return true;
+        if (*str != '\0' && *pattern == '\0')
+            return false;
+        //if the next character in pattern is not '*'
+        if (*(pattern+1) != '*')
+        {
+            if (*str == *pattern || (*str != '\0' && *pattern == '.'))
+                return match(str+1, pattern+1);
+            else
+                return false;
+        }
+        //if the next character is '*'
+        else
+        {
+            if (*str == *pattern || (*str != '\0' && *pattern == '.'))
+                return match(str, pattern+2) || match(str+1, pattern);
+            else
+                return match(str, pattern+2);
+        }
+    }
+};
+
+class _30_offer {
+    /*
+     * 翻转字符串2次
+     */
+    string ReverseSentence(string str) {
+        int len = str.length();
+        reverse(str.begin(),str.end());
+        int start = 0,end = 0;
+        while (end>=start && end < len) {
+            while (str[end] != ' ' && end < len) end++;
+            reverse(str.begin() + start,str.begin() + end - 1);
+            start = ++end;
+        }
+        return str;
     }
 };

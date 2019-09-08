@@ -3,6 +3,8 @@
         "istream": "cpp",
         "string_view": "cpp",
         "queue": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "iosfwd": "cpp",
+        "algorithm": "cpp"
     }
 }
