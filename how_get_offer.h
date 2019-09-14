@@ -476,11 +476,36 @@ class _17_offer {
      * 序列化时通过 某种符号表示空节点（#），以 ！ 表示一个结点值的结束（value!）。
      * 二叉树的反序列化是指：根据某种遍历顺序得到的序列化字符串结果str，重构二叉树。
      */
-    char* Serialize(TreeNode *root) {    
-        
+    char* Serialize(TreeNode *root) { 
+        if (!root)
+            return "#";
+        string res = to_string(int(root->val));
+        res.push_back(',');
+        char* left = Serialize(root->left);
+        char* right = Serialize(root->right);
+        char* ret = new char[strlen(left)+strlen(right)+res.size()];
+        strcpy(ret,res.c_str());
+        strcat(ret,left);
+        strcat(ret,right);
+        return ret;
     }
     TreeNode* Deserialize(char *str) {
-        
+        return decode(str);   
+    }
+    TreeNode* decode(char* &str)
+    {
+        if (*str=='#') {
+            ++str;
+            return NULL;
+        }
+        int num =0;
+        while(*str != ',')
+            num = num * 10 + (*(str++) - '0');
+        str++;
+        TreeNode* res = new TreeNode(num);
+        res->left=decode(str);
+        res->right=decode(str);
+        return res;
     }
 };
 
@@ -716,6 +741,7 @@ class _28_offer {
     vector<vector<int> > FindContinuousSequence(int sum) {
         vector<vector<int> > res;
         if (sum <= 0) return res;
+        // 双指针
         int i = 1 , j = 2;
         while (j > i) {
             int curSum = (i + j)*(j - i + 1) / 2;
@@ -770,7 +796,7 @@ class _29_offer {
 
 class _30_offer {
     /*
-     * 翻转字符串2次
+     * 翻转字符串2次 'i am a student.' -> 'student. a am i'
      */
     string ReverseSentence(string str) {
         int len = str.length();
@@ -782,5 +808,295 @@ class _30_offer {
             start = ++end;
         }
         return str;
+    }
+};
+
+class _31_offer {
+    /*
+     * 如果牌能组成顺子就输出true，否则就输出false。为了方便起见,你可以认为大小王是0。
+     */
+    bool IsContinuous( vector<int> numbers ) {
+        int len = numbers.size();
+        if (len <= 4) return false;
+        sort(numbers.begin(),numbers.end());
+        // 需要满足最大 - 最小 >= 5 并且中间没有重复的出现
+        int minNum = INT_MAX,maxNum = 0;
+        for (int i = 0 ; i < len - 1; i++ ) {
+            if (numbers[i] <= 0) continue;
+            if (numbers[i] == numbers[i - 1]) return false;
+            minNum = min(numbers[i],minNum);
+            maxNum = max(numbers[i],maxNum);
+        }
+        // 比较最后一位
+        minNum = min(numbers[len - 1],minNum);
+        maxNum = max(numbers[len - 1],maxNum);
+        if (maxNum - minNum >= 5) 
+            return false;
+        return true;
+    }
+};
+
+class _32_offer {
+    /*
+     * 给定一个数组A[0,1,...,n-1],请构建一个数组B[0,1,...,n-1],
+     * 其中B中的元素B[i]=A[0]*A[1]*...*A[i-1]*A[i+1]*...*A[n-1]。不能使用除法。
+     */
+    vector<int> multiply(const vector<int>& A) {
+        int len = A.size();
+        vector<int> B(len);
+        if (len <= 0)
+            return B;
+        // 可以将这个看成一个二维矩阵 对角线方向的数字为1 B则是每行的乘积
+        B[0] = 1;
+        // 求下三角形的乘积
+        for (int i = 1 ; i < len ; i++ ) {
+            B[i] = B[i - 1] * A[i - 1];
+        }
+        int tmp = 1;
+        // 求上三角形的乘积
+        for (int i = len - 2 ; i >= 0 ; i-- ) {
+            tmp *= A[i + 1];
+            B[i] *= tmp;
+        }
+        return B;  
+    }
+};
+
+class _33_offer {
+    /*
+     * 输入一个字符串,按字典序打印出该字符串中字符的所有排列
+     * 例如输入字符串abc,则打印出由字符a,b,c所能排列出来的所有字符串abc,acb,bac,bca,cab和cba。
+     */
+    vector<string> Permutation(string str) {
+        vector<string> res;
+        int len = str.size();
+        if (len <= 0 )
+            return res;
+        perSub(res ,str ,0);
+        // 单独排序得到字典顺序
+        sort(res.begin(),res.end());
+        return res;
+    }
+
+    void perSub(vector<string> &res,string str,int start) {
+        if (start < 0 || str.size() == 0) return;
+        if (start == str.size() - 1) {
+            // 递归结束条件 递归到str的最后一个的字符的时候
+            res.push_back(str);
+        } else {
+            // 第一层循环相当于第一个位子自身交换
+            for (int i = start ; i < str.size() ; i++ ) {
+                if (i != start && str[i] == str[start])
+                    continue;
+                    swap(str[start],str[i]);
+                    perSub(res , str,start + 1);
+                    swap(str[start],str[i]);// 复位用于恢复之前的序列
+            }
+        }
+    }
+};
+
+class _34_offer {
+    /*
+     * 请实现一个函数用来找出字符流中第一个只出现一次的字符。
+     * 例如，当从字符流中只读出前两个字符"go"时，第一个只出现一次的字符是"g"。
+     * 当从该字符流中读出前六个字符“google"时，第一个只出现一次的字符是"l"。
+     * 如果当前字符流没有存在出现一次的字符，返回#字符。
+     */
+public:
+    //Insert one char from stringstream
+    void Insert(char ch)
+    {
+        res.push_back(ch);
+        mapdata[ch]++;
+    }
+    //return the first appearence once char in current stringstream
+    char FirstAppearingOnce()
+    {
+       vector<int>::iterator it;
+       for (it = res.begin() ; it != res.end() ; it++ ) {
+           if (mapdata[*it] == 1)
+                return *it;
+       }
+       return '#';
+    }
+private:
+    map<char,int> mapdata;
+    vector<int> res;    
+};
+
+class _35_offer {
+    /*
+     * 请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。
+     * 例如，字符串"+100","5e2","-123","3.1416"和"-1E-16"都表示数值。 
+     * 但是"12e","1a3.14","1.2.3","+-5"和"12e+4.3"都不是。
+     */
+    bool isNumeric(char* str) {
+        // 标记符号、小数点、e是否出现过
+        bool sign = false, decimal = false, hasE = false;
+        for (int i = 0; i < strlen(str); i++) {
+            if (str[i] == 'e' || str[i] == 'E') {
+                if (i == strlen(str)-1) return false; // e后面一定要接数字
+                if (hasE) return false;  // 不能同时存在两个e
+                hasE = true;
+            } else if (str[i] == '+' || str[i] == '-') {
+                // 第二次出现+-符号，则必须紧接在e之后
+                if (sign && str[i-1] != 'e' && str[i-1] != 'E') return false;
+                // 第一次出现+-符号，且不是在字符串开头，则也必须紧接在e之后
+                if (!sign && i > 0 && str[i-1] != 'e' && str[i-1] != 'E') return false;
+                sign = true;
+            } else if (str[i] == '.') {
+              // e后面不能接小数点，小数点不能出现两次
+                if (hasE || decimal) return false;
+                decimal = true;
+            } else if (str[i] < '0' || str[i] > '9') // 不合法字符
+                return false;
+        }
+        return true;
+    }
+};
+
+class _36_offer {
+    /*
+     * 在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。
+     * 输入一个数组,求出这个数组中的逆序对的总数P。并将P对1000000007取模的结果输出。
+     * 即输出P%1000000007
+     */
+    int InversePairs(vector<int> data) {
+        int len = (int)data.size();
+        if (len <= 0) {
+            return 0;
+        }
+        vector<int> copy(data);
+        long long count = InversePairs(data,copy,0,len - 1);
+        return count%1000000007;
+    }
+
+    long long InversePairs(vector<int> &data,vector<int> &copy,int start ,int end) {
+        if(start == end)
+          {
+            copy[start] = data[start];
+            return 0;
+          }
+       int length=(end - start)/2;
+       long long left = InversePairs(copy,data,start,start + length);
+       long long right = InversePairs(copy,data,start + length + 1,end); 
+        
+       int i = start + length;
+       int j = end;
+       int indexcopy = end;
+       long long count = 0;
+       while(i >= start && j >= start + length + 1)
+          {
+             if(data[i] > data[j])
+                {
+                  copy[indexcopy--] = data[i--];
+                  count=count + j - start - length;          //count=count+j-(start+length+1)+1;
+                }
+             else
+                {
+                  copy[indexcopy--] = data[j--];
+                }          
+          }
+       for(; i >= start ; i--)
+           copy[indexcopy--] = data[i];
+       for(;j >= start + length + 1 ;j--)
+           copy[indexcopy--] = data[j];       
+       return left + right + count;
+    }
+};
+
+class _37_offer {
+    /*
+     * 将一个字符串转换成一个整数(实现Integer.valueOf(string)的功能，
+     * 但是string不符合数字要求时返回0)，要求不能使用字符串转换整数的库函数。
+     * 数值为0或者字符串不是一个合法的数值则返回0。
+     */
+    int StrToInt(string str) {
+        int n = str.size(), s = 1;
+        long long res = 0;
+        if(!n) return 0;
+        if(str[0] == '-') s = -1;
+        for(int i = (str[0] ==  '-' || str[0] == '+') ? 1 : 0; i < n; ++i){
+            if(!('0' <= str[i] && str[i] <= '9')) return 0;
+            res = (res << 1) + (res << 3) + (str[i] & 0xf);//res=res*10+str[i]-'0';
+        } 
+        return res * s;
+    }
+};
+
+class _39_offer {
+    /*
+     * 请设计一个函数，用来判断在一个矩阵中是否存在一条包含某字符串所有字符的路径。
+     * 路径可以从矩阵中的任意一个格子开始，每一步可以在矩阵中向左，向右，向上，向下移动一个格子。
+     * 如果一条路径经过了矩阵中的某一个格子，则该路径不能再进入该格子。
+     * 例如 a b c e s f c s a d e e 矩阵中包含一条字符串"bcced"的路径，
+     * 但是矩阵中不包含"abcb"路径，因为字符串的第一个字符b占据了矩阵中的第一行第二个格子之后，路径不能再次进入该格子。
+     */
+    bool hasPath(char* matrix, int rows, int cols, char* str)
+    {
+        vector<char> flags(rows*cols,0);
+        bool condition=false;
+        for(int i=0;i<rows;i++) {
+            for(int j=0;j<cols;j++) {
+                condition= (condition || isPath(matrix,flags,str,i,j,rows,cols) );
+            }
+        }
+        return condition;    
+    }
+    bool isPath(char *matrix,vector<char> flags,char* str,int x,int y,int rows, int cols)
+    {
+        if(x<0 || x>=rows || y<0 || y>=cols) //越界的点
+            return false;     
+        if( matrix[x*cols+y]== *str  &&  flags[x*cols+y]==0 ) {
+            flags[x*cols+y]=1;
+            if(*(str+1)==0)  // 字符串结尾了（最后一个满足的）
+                return true;
+            bool condition =isPath(matrix,flags,(str+1),x,y-1,rows,cols) ||
+                isPath(matrix,flags,(str+1),x-1,y,rows,cols)||
+                isPath(matrix,flags,(str+1),x,y+1,rows,cols)||
+                isPath(matrix,flags,(str+1),x+1,y,rows,cols);           
+            if(condition == false)
+                flags[x*cols+y]=0;
+            return condition;             
+        }           
+        else
+            return false;
+    }
+};
+
+class _40_offer {
+    /*
+     * 地上有一个m行和n列的方格。一个机器人从坐标0,0的格子开始移动，每一次只能向左，右，上，下四个方向移动一格，
+     * 但是不能进入行坐标和列坐标的数位之和大于k的格子。 例如，当k为18时，机器人能够进入方格（35,37），
+     * 因为3+5+3+7 = 18。但是，它不能进入方格（35,38），因为3+5+3+8 = 19。请问该机器人能够达到多少个格子？
+     */ 
+    int movingCount(int threshold, int rows, int cols) {
+       bool *flag = new bool[rows * cols];
+        for(int i = 0; i < rows * cols; i++)
+            flag[i] = false;
+        int count = moving(threshold, rows, cols, 0, 0, flag);
+        return count; 
+    }
+    int moving(int threshold, int rows, int cols, int i, int j, bool* flag) {
+        int count = 0;
+        if(i >= 0 && i < rows && j >= 0 && j < cols && getsum(i) + getsum(j) <= threshold && flag[i * cols + j] == false)
+            {
+            flag[i * cols + j] = true;
+            count =1 + moving(threshold, rows, cols, i + 1, j, flag)
+                + moving(threshold, rows, cols, i - 1, j, flag)
+                + moving(threshold, rows, cols, i , j - 1, flag)
+                + moving(threshold, rows, cols, i, j + 1, flag);
+        }
+        return count;
+    }
+    int getsum(int num) {
+        int sum = 0;
+        while(num) {
+            sum += num % 10;
+            num /= 10;
+              
+        }
+        return sum;
     }
 };
