@@ -7,7 +7,8 @@
         "iosfwd": "cpp",
         "algorithm": "cpp",
         "iostream": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "unordered_map": "cpp"
     },
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "enabled"
 }
