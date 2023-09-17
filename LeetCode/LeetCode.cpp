@@ -69,7 +69,7 @@ public:
     bool isPalindrome(int x) {
         if (x < 0) return false;
 
-        string str = s.to_string();
+        string str = to_string(x);
         string newStr = reverseString(str);
         if (str == newStr) {
             return true;
