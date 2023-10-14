@@ -55,6 +55,23 @@ public:
         return max(rob(nums, 0, size - 2), rob(nums, 1, size - 1));
     }
 
+    map<TreeNode*, int> f, g;
+
+    void dfs(TreeNode * node) {
+        if (!node) return;
+        dfs(node->left);
+        dfs(node->right);
+        // f 代表选取当前节点的最大值
+        f[node] = node->val + g[node->left] + g[node->right];
+        // g 表示不选取当前节点的最大值
+        g[node] = max(f[node->left], g[node->left]) + max(f[node->right], g[node->right]);
+    }
+
+    int rob(TreeNode* root) {
+        dfs(root);
+        return max(f[root], g[root]);
+    }
+
     string reverseString(const string& str) {
         string reversedStr;
         int length = str.length();
